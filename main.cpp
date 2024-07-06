@@ -20,8 +20,13 @@ auto precedence = [](token_t type) {
     }
 };
 
-int main() {
-    std::string problem = "4^2"; // -4
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <expression>" << std::endl;
+        return 1;
+    }
+
+    std::string problem = argv[1];
 
     std::vector<token> tokens = tokenize(problem);
 
@@ -54,6 +59,10 @@ int main() {
     }
 
     while (!ops.empty()) {
+        if (nodes.size() < 2) {
+            std::cerr << "Error: not enough operands for operator " << ops.top().value << std::endl;
+            return 1;
+        }
         node* right = nodes.top(); nodes.pop();
         node* left = nodes.top(); nodes.pop();
         nodes.push(new node(ops.top(), left, right));

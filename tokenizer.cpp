@@ -30,6 +30,7 @@ std::vector<token> tokenize(const std::string& input) {
                 break;
                 case '*':
                     tokens.push_back({token_t::MULTIPLY, "*"});
+                break;
                 case '^':
                     tokens.push_back({token_t::EXPONENT, "^"});
                 break;

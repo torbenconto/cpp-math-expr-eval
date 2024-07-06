@@ -15,6 +15,10 @@ auto precedence = [](token_t type) {
             return 2;
         case token_t::EXPONENT:
             return 3;
+        case token_t::SIN:
+            case token_t::COS:
+        case token_t::TAN:
+            return 4;
         default:
             return 0;
     }
@@ -42,7 +46,8 @@ int main(int argc, char* argv[]) {
         } else if (t.type == token_t::RPAREN) {
             while (!ops.empty() && ops.top().type != token_t::LPAREN) {
                 node* right = nodes.top(); nodes.pop();
-                node* left = nodes.top(); nodes.pop();
+                node* left = (ops.top().type == token_t::SIN || ops.top().type == token_t::COS || ops.top().type == token_t::TAN) ? nullptr : nodes.top();
+                if (left) nodes.pop();
                 nodes.push(new node(ops.top(), left, right));
                 ops.pop();
             }
@@ -50,7 +55,8 @@ int main(int argc, char* argv[]) {
         } else {
             while (!ops.empty() && precedence(t.type) <= precedence(ops.top().type)) {
                 node* right = nodes.top(); nodes.pop();
-                node* left = nodes.top(); nodes.pop();
+                node* left = (ops.top().type == token_t::SIN || ops.top().type == token_t::COS || ops.top().type == token_t::TAN) ? nullptr : nodes.top();
+                if (left) nodes.pop();
                 nodes.push(new node(ops.top(), left, right));
                 ops.pop();
             }
@@ -59,12 +65,13 @@ int main(int argc, char* argv[]) {
     }
 
     while (!ops.empty()) {
-        if (nodes.size() < 2) {
+        if (nodes.size() < 2 && (ops.top().type != token_t::SIN && ops.top().type != token_t::COS && ops.top().type != token_t::TAN)) {
             std::cerr << "Error: not enough operands for operator " << ops.top().value << std::endl;
             return 1;
         }
         node* right = nodes.top(); nodes.pop();
-        node* left = nodes.top(); nodes.pop();
+        node* left = (ops.top().type == token_t::SIN || ops.top().type == token_t::COS || ops.top().type == token_t::TAN) ? nullptr : nodes.top();
+        if (left) nodes.pop();
         nodes.push(new node(ops.top(), left, right));
         ops.pop();
     }

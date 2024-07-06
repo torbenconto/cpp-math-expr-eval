@@ -38,6 +38,12 @@ float evaluate(node* root) {
         return left / right;
         case token_t::EXPONENT:
             return std::pow(left, right);
+        case token_t::SIN:
+            return std::sin(right);
+        case token_t::COS:
+            return std::cos(right);
+        case token_t::TAN:
+            return std::tan(right);
         default:
             std::cerr << "Unknown token type" << std::endl;
         return 0; // Handle unknown token type error

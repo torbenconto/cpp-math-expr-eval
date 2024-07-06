@@ -17,6 +17,9 @@ enum class token_t {
     LPAREN,
     RPAREN,
     EXPONENT,
+    SIN,
+    COS,
+    TAN,
     UNKNOWN,
 };
 

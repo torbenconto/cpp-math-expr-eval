@@ -30,6 +30,8 @@ std::vector<token> tokenize(const std::string& input) {
                 break;
                 case '*':
                     tokens.push_back({token_t::MULTIPLY, "*"});
+                case '^':
+                    tokens.push_back({token_t::EXPONENT, "^"});
                 break;
                 case '/':
                     tokens.push_back({token_t::DIVIDE, "/"});

@@ -13,13 +13,15 @@ auto precedence = [](token_t type) {
         case token_t::MULTIPLY:
         case token_t::DIVIDE:
             return 2;
+        case token_t::EXPONENT:
+            return 3;
         default:
             return 0;
     }
 };
 
 int main() {
-    std::string problem = "4 * ( 5 - 6 )"; // -4
+    std::string problem = "4^2"; // -4
 
     std::vector<token> tokens = tokenize(problem);
 

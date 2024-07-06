@@ -4,6 +4,7 @@
 
 #include "tree.h"
 #include <iostream>
+#include <cmath>
 
 float evaluate(node* root) {
     if (!root) {
@@ -35,6 +36,8 @@ float evaluate(node* root) {
                 return 0; // Or handle division by zero error
             }
         return left / right;
+        case token_t::EXPONENT:
+            return std::pow(left, right);
         default:
             std::cerr << "Unknown token type" << std::endl;
         return 0; // Handle unknown token type error

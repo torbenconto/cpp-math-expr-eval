@@ -16,6 +16,7 @@ enum class token_t {
     DIVIDE,
     LPAREN,
     RPAREN,
+    EXPONENT,
     UNKNOWN,
 };
 

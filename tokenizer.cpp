@@ -8,6 +8,7 @@
 #include <vector>
 #include <cctype>
 #include <unordered_map>
+#include <iostream>
 
 std::vector<token> tokenize(const std::string& input) {
     std::vector<token> tokens;
@@ -25,7 +26,7 @@ std::vector<token> tokenize(const std::string& input) {
 
     for (size_t i = 0; i < input.size(); ++i) {
         char c = input[i];
-        if (std::isdigit(c)) {
+        if (std::isdigit(c) || (c == '-' && i + 1 < input.size() && std::isdigit(input[i + 1]))) {
             number += c;
         } else {
             if (!number.empty()) {
@@ -43,6 +44,25 @@ std::vector<token> tokenize(const std::string& input) {
                 i += 2;
             } else if (c == 't' && input.substr(i, 3) == "tan") {
                 tokens.push_back({token_t::TAN, "tan"});
+                i += 2;
+            } else if (c == 's' && input.substr(i, 4) == "sqrt") {
+                tokens.push_back({token_t::SQRT, "sqrt"});
+                i += 3;
+            } else if (c == 'l' && input.substr(i, 3) == "log") {
+                if (i + 3 < input.size() && std::isdigit(input[i + 3])) {
+                    std::string base;
+                    i += 3;
+                    while (i < input.size() && std::isdigit(input[i])) {
+                        base += input[i++];
+                    }
+                    --i; // roll back the last increment
+                    tokens.push_back({token_t::LOG_BASE, base});
+                } else {
+                    tokens.push_back({token_t::LOG, "log"});
+                    i += 2;
+                }
+            } else if (c == 'a' && input.substr(i, 3) == "abs") {
+                tokens.push_back({token_t::ABS, "abs"});
                 i += 2;
             } else if (!std::isspace(c)) {
                 tokens.push_back({token_t::UNKNOWN, std::string(1, c)});

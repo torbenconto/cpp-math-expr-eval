@@ -4,7 +4,6 @@
 #include "tokenizer.h"
 #include "tree.h"
 
-
 auto precedence = [](token_t type) {
     switch (type) {
         case token_t::PLUS:
@@ -16,13 +15,22 @@ auto precedence = [](token_t type) {
         case token_t::EXPONENT:
             return 3;
         case token_t::SIN:
-            case token_t::COS:
+        case token_t::COS:
         case token_t::TAN:
+        case token_t::SQRT:
+        case token_t::LOG:
+        case token_t::LOG_BASE:
+        case token_t::ABS:
             return 4;
         default:
             return 0;
     }
 };
+
+bool isUnaryOperator(token_t type) {
+    return type == token_t::SIN || type == token_t::COS || type == token_t::TAN ||
+           type == token_t::SQRT || type == token_t::LOG || type == token_t::LOG_BASE || type == token_t::ABS;
+}
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -35,9 +43,9 @@ int main(int argc, char* argv[]) {
     std::vector<token> tokens = tokenize(problem);
 
     node* root;
-    // Shunting yard algorithm with 2 stacks instead of 1 stack and 1 queue
     std::stack<token> ops;
     std::stack<node*> nodes;
+
     for (const token& t : tokens) {
         if (t.type == token_t::NUMBER) {
             nodes.push(new node(t));
@@ -45,35 +53,49 @@ int main(int argc, char* argv[]) {
             ops.push(t);
         } else if (t.type == token_t::RPAREN) {
             while (!ops.empty() && ops.top().type != token_t::LPAREN) {
-                node* right = nodes.top(); nodes.pop();
-                node* left = (ops.top().type == token_t::SIN || ops.top().type == token_t::COS || ops.top().type == token_t::TAN) ? nullptr : nodes.top();
-                if (left) nodes.pop();
-                nodes.push(new node(ops.top(), left, right));
+                token op = ops.top();
                 ops.pop();
+                node* operand = nodes.top();
+                nodes.pop();
+                if (isUnaryOperator(op.type)) {
+                    nodes.push(new node(op, nullptr, operand));
+                } else {
+                    node* left = nodes.top();
+                    nodes.pop();
+                    nodes.push(new node(op, left, operand));
+                }
             }
             ops.pop(); // Pop the left parenthesis
         } else {
             while (!ops.empty() && precedence(t.type) <= precedence(ops.top().type)) {
-                node* right = nodes.top(); nodes.pop();
-                node* left = (ops.top().type == token_t::SIN || ops.top().type == token_t::COS || ops.top().type == token_t::TAN) ? nullptr : nodes.top();
-                if (left) nodes.pop();
-                nodes.push(new node(ops.top(), left, right));
+                token op = ops.top();
                 ops.pop();
+                node* operand = nodes.top();
+                nodes.pop();
+                if (isUnaryOperator(op.type)) {
+                    nodes.push(new node(op, nullptr, operand));
+                } else {
+                    node* left = nodes.top();
+                    nodes.pop();
+                    nodes.push(new node(op, left, operand));
+                }
             }
             ops.push(t);
         }
     }
 
     while (!ops.empty()) {
-        if (nodes.size() < 2 && (ops.top().type != token_t::SIN && ops.top().type != token_t::COS && ops.top().type != token_t::TAN)) {
-            std::cerr << "Error: not enough operands for operator " << ops.top().value << std::endl;
-            return 1;
-        }
-        node* right = nodes.top(); nodes.pop();
-        node* left = (ops.top().type == token_t::SIN || ops.top().type == token_t::COS || ops.top().type == token_t::TAN) ? nullptr : nodes.top();
-        if (left) nodes.pop();
-        nodes.push(new node(ops.top(), left, right));
+        token op = ops.top();
         ops.pop();
+        node* operand = nodes.top();
+        nodes.pop();
+        if (isUnaryOperator(op.type)) {
+            nodes.push(new node(op, nullptr, operand));
+        } else {
+            node* left = nodes.top();
+            nodes.pop();
+            nodes.push(new node(op, left, operand));
+        }
     }
 
     root = nodes.top();

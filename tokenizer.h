@@ -20,6 +20,10 @@ enum class token_t {
     SIN,
     COS,
     TAN,
+    SQRT,
+    LOG,
+    LOG_BASE,
+    ABS,
     UNKNOWN,
 };
 

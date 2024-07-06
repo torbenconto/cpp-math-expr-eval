@@ -16,7 +16,7 @@ float evaluate(node* root) {
             return std::stof(root->data.value);
         } catch (const std::invalid_argument& e) {
             std::cerr << "Invalid argument: " << e.what() << std::endl;
-            return 0; // Or handle the error as appropriate
+            return 0;
         }
     }
 
@@ -33,7 +33,7 @@ float evaluate(node* root) {
         case token_t::DIVIDE:
             if (right == 0) {
                 std::cerr << "Division by zero error" << std::endl;
-                return 0; // Or handle division by zero error
+                return 0;
             }
         return left / right;
         case token_t::EXPONENT:
@@ -44,8 +44,16 @@ float evaluate(node* root) {
             return std::cos(right);
         case token_t::TAN:
             return std::tan(right);
+        case token_t::SQRT:
+            return std::sqrt(right);
+        case token_t::LOG:
+            return std::log(right);
+        case token_t::LOG_BASE:
+            return std::log(right) / std::log(std::stof(root->data.value));
+        case token_t::ABS:
+            return std::abs(right);
         default:
             std::cerr << "Unknown token type" << std::endl;
-        return 0; // Handle unknown token type error
+        return 0;
     }
 }
